@@ -21,6 +21,12 @@ export class PersonComponent implements OnInit {
       birthday: new Date("August 02, 1998")
     } as Person,
     {
+      firstname: "Glai",
+      lastname: "Mores",
+      gender: "Female",
+      birthday: new Date("January 02, 2001")
+    } as Person,
+     {
       firstname: "Glaiza",
       lastname: "Mores",
       gender: "Female",

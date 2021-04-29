@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { from, fromEvent, Observable, of } from "rxjs";
+import { FormControl, FormGroup } from "@angular/forms";
+import { from, fromEvent, Observable, of, pipe } from "rxjs";
 import {
   debounceTime,
   distinctUntilChanged,
@@ -18,12 +19,55 @@ import { Person } from "../people.model";
 export class SearchComponent implements OnInit {
   @Input() searchData: Person[];
   result: Person[];
-  //searchForm = new FormControl("");
-
-  constructor() {}
-
+  searchInput: FormControl; 
+  constructor() {} 
   ngOnInit() {
+    //declare new instance of the search input.
+    this.searchInput = new FormControl();
+
+    //chain event from observable event to search input
+    this.searchInput.valueChanges
+    .pipe( 
+        //filter gets the input value, check if its more than 2 characters to proceed the search, other wise clear the result list.
+        filter(text => {
+          if(text.length >= 3){return true;}
+          else {this.result = null;return false;}
+        }),
+
+        //debounceTime sets the search key event to get to run for a certain period to avoid log. this takes the recent input value
+        debounceTime(10),
+        
+        // distinctUntilChanged ignore if next search query is same as previous
+        distinctUntilChanged(), 
+
+        //switch map  sets the data to new observable based on the return/source observalbe valueChanges
+        //switchMap(searchTerm => this.search(searchTerm)),
+        switchMap(searchTerm => { 
+          return from(this.searchData).pipe(
+              filter(person => person.firstname.indexOf(searchTerm) > -1),
+              map(item => item as Person),
+              toArray()
+            );
+      }),
+
+    ).subscribe(data=>{
+        this.result = data
+    }); 
+  }
+
+  search(searchkey) { 
+    return from(this.searchData).pipe(
+      filter(person => person.firstname.indexOf(searchkey) > -1),
+      map(item => item as Person),
+      toArray()
+    );
+  }
+  testCodes(){
     
+
+    // this.searchForm = new FormGroup({
+    //     name: new FormControl()
+    //   });
     //emit ({name: 'Joe', age: 31}, {name: 'Bob', age:25})
     const source = from([
       { name: "Joe 31", age: 31 },
@@ -43,10 +87,7 @@ export class SearchComponent implements OnInit {
   .pipe(map((x) => x * x))
   .subscribe((v) => console.log(`value: ${v}`));
 
-
-
-
-    const searchBox = document.getElementById("search-box");
+    const searchBox = document.getElementById("search");
     //fromEvent(searchBox, "input") is an observable event (observing on every changes on input type)
 
     const typeahead = fromEvent(searchBox, "input").pipe(
@@ -60,15 +101,6 @@ export class SearchComponent implements OnInit {
     typeahead.subscribe(data => { 
       this.result = data;
     });
-  }
-
-  search(searchkey) {
-    
-    return from(this.searchData).pipe(
-      filter(person => person.firstname.indexOf(searchkey) > -1),
-      map(item => item as Person),
-      toArray()
-    );
   }
 }
 
