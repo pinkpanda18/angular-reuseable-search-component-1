@@ -6,7 +6,7 @@ import {
   filter,
   map,
   switchMap,
-toArray
+  toArray
 } from "rxjs/operators";
 import { Person } from "../people.model";
 
@@ -18,11 +18,12 @@ import { Person } from "../people.model";
 export class SearchComponent implements OnInit {
   @Input() searchData: Person[];
   result: Person[];
-  searchForm = new FormControl("");
+  //searchForm = new FormControl("");
 
   constructor() {}
 
-  ngOnInit() {  
+  ngOnInit() {
+    
     //emit ({name: 'Joe', age: 31}, {name: 'Bob', age:25})
     const source = from([
       { name: "Joe 31", age: 31 },
@@ -37,24 +38,32 @@ export class SearchComponent implements OnInit {
       console.log(`Over 30: ${val.name}`)
     );
 
-    const searchBox = document.getElementById("search-box"); 
+
+   of(1, 2, 3)
+  .pipe(map((x) => x * x))
+  .subscribe((v) => console.log(`value: ${v}`));
+
+
+
+
+    const searchBox = document.getElementById("search-box");
     //fromEvent(searchBox, "input") is an observable event (observing on every changes on input type)
 
     const typeahead = fromEvent(searchBox, "input").pipe(
       map((e: KeyboardEvent) => (e.target as HTMLInputElement).value),
       filter(text => text.length >= 3),
       debounceTime(10),
-      distinctUntilChanged(), // ignore if next search query is same as previous 
+      distinctUntilChanged(), // ignore if next search query is same as previous
       switchMap(searchTerm => this.search(searchTerm))
     );
 
-    typeahead.subscribe(data => {
-      console.log(data);
+    typeahead.subscribe(data => { 
       this.result = data;
     });
   }
 
-  search(searchkey) { 
+  search(searchkey) {
+    
     return from(this.searchData).pipe(
       filter(person => person.firstname.indexOf(searchkey) > -1),
       map(item => item as Person),
