@@ -20,6 +20,7 @@ export class SearchComponent implements OnInit {
   @Input() searchData: Person[];
   result: Person[];
   searchInput: FormControl; 
+  @Output() goToPage = new EventEmitter<number>(); //This will serve as output attribute that parent component can use
   constructor() {} 
   ngOnInit() {
     //declare new instance of the search input.
@@ -62,6 +63,13 @@ export class SearchComponent implements OnInit {
       toArray()
     );
   }
+  
+  //SetPage event to emit the output attribute
+  public setPage(person: Person): void {
+    this.goToPage.emit(person);
+  }
+}
+  
   testCodes(){
     
 
