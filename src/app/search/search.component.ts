@@ -113,3 +113,4 @@ export class SearchComponent implements OnInit {
 }
 
 //https://www.tektutorialshub.com/angular/rxjs-observable-using-create-of-from-in-angular/
+//https://itnext.io/angular-search-pagination-41572ef0078f
